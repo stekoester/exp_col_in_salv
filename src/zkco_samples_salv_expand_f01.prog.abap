@@ -37,8 +37,9 @@ FORM alv_display.
 
       DATA(lr_events) = go_salv_table->get_event( ).
       DATA(lr_event_handler) = NEW lcl_handle_events( ).
-      SET HANDLER lr_event_handler->handle_added_function FOR lr_events.
-      SET HANDLER lr_event_handler->handle_link_click FOR lr_events.
+      SET HANDLER:
+        lr_event_handler->handle_added_function FOR lr_events,
+        lr_event_handler->handle_link_click     FOR lr_events.
 
       TRY.
           go_salv_table->get_columns( )->set_cell_type_column( 'CELL_TYPE' ).
