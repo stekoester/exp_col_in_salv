@@ -12,9 +12,9 @@ FORM data_get.
         AND devclass EQ 'SCTS_CAT'.
     IF sy-subrc EQ 0.
       DATA(ls_tadir) = gt_tadir[ lines( gt_tadir ) ].
-      APPEND VALUE #( pgmid = ls_tadir-pgmid
-                      object = ls_tadir-object
-                      expand = lcl_handle_events=>get_icon( iv_type = 'E' )
+      APPEND VALUE #( pgmid     = ls_tadir-pgmid
+                      object    = ls_tadir-object
+                      expand    = lcl_handle_events=>get_icon( iv_type = 'E' )
                       cell_type = VALUE #( ( columnname = 'EXPAND'
                                              value      = if_salv_c_cell_type=>hotspot ) ) ) TO gt_tadir_output.
     ENDIF.
@@ -29,7 +29,7 @@ FORM alv_display.
   TRY.
       cl_salv_table=>factory(
         EXPORTING
-          r_container = NEW cl_gui_custom_container( 'ALV' )
+          r_container    = NEW cl_gui_custom_container( 'ALV' )
         IMPORTING
           r_salv_table   = go_salv_table
         CHANGING
