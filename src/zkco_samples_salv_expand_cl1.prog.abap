@@ -49,16 +49,15 @@ CLASS lcl_handle_events IMPLEMENTATION.
           WHEN gcs_toolbar-expall_name.
             LOOP  AT gt_tadir_output ASSIGNING FIELD-SYMBOL(<ls_tadir_output>)
                   WHERE expand(3) EQ icon_expand(3).
-              DATA(lv_tabix) = sy-tabix.
+              DATA(lv_add_subrows_index) = sy-tabix + 1.
               <ls_tadir_output>-expand = lcl_handle_events=>get_icon( iv_type = 'C' ).
-              DATA(lt_tadir) = VALUE zkco_samples_salv_tadir_t( FOR ls_tadir IN gt_tadir
-                                                                WHERE ( pgmid  EQ <ls_tadir_output>-pgmid AND
-                                                                        object EQ <ls_tadir_output>-object )
-                                                                ( ls_tadir ) ).
-              LOOP AT lt_tadir REFERENCE INTO DATA(lr_tadir).
-                INSERT CORRESPONDING #( lr_tadir->* EXCEPT expand ) INTO gt_tadir_output
-                       INDEX lv_tabix + sy-tabix.
-              ENDLOOP.
+              INSERT LINES OF VALUE zkco_samples_salv_tadir_out_t(
+                  FOR ls_tadir IN gt_tadir
+                  WHERE ( pgmid  EQ <ls_tadir_output>-pgmid AND
+                          object EQ <ls_tadir_output>-object )
+                  ( CORRESPONDING #( ls_tadir ) ) )
+                INTO gt_tadir_output
+                INDEX lv_add_subrows_index.
             ENDLOOP.
             IF sy-subrc EQ 0.
               DATA(lv_refresh_alv) = abap_true.
@@ -67,9 +66,9 @@ CLASS lcl_handle_events IMPLEMENTATION.
             LOOP  AT gt_tadir_output ASSIGNING <ls_tadir_output>
                   WHERE expand(3) EQ icon_collapse(3).
               <ls_tadir_output>-expand = lcl_handle_events=>get_icon( iv_type = 'E' ).
-              DELETE gt_tadir_output  FROM sy-tabix + 1
-                                      WHERE pgmid  EQ <ls_tadir_output>-pgmid
-                                        AND object EQ <ls_tadir_output>-object.
+              DELETE gt_tadir_output  WHERE pgmid  EQ <ls_tadir_output>-pgmid
+                                        AND object EQ <ls_tadir_output>-object
+                                        AND expand IS INITIAL.
             ENDLOOP.
             IF sy-subrc EQ 0.
               lv_refresh_alv = abap_true.
@@ -79,8 +78,9 @@ CLASS lcl_handle_events IMPLEMENTATION.
       CATCH cx_salv_data_error.
       CATCH cx_salv_existing.
     ENDTRY.
-
-    go_salv_table->refresh( refresh_mode = if_salv_c_refresh=>full ).
+    IF lv_refresh_alv EQ abap_true.
+      go_salv_table->refresh( refresh_mode = if_salv_c_refresh=>full ).
+    ENDIF.
   ENDMETHOD.
 
 
@@ -107,23 +107,22 @@ CLASS lcl_handle_events IMPLEMENTATION.
         ASSIGN gt_tadir_output[ row ] TO FIELD-SYMBOL(<ls_tadir_output>).
         IF <ls_tadir_output>-expand(3) EQ icon_expand(3).
           <ls_tadir_output>-expand = lcl_handle_events=>get_icon( iv_type = 'C' ).
-          DATA(lt_tadir) = VALUE zkco_samples_salv_tadir_t( FOR ls_tadir IN gt_tadir
-                                                            WHERE ( pgmid  EQ <ls_tadir_output>-pgmid AND
-                                                                    object EQ <ls_tadir_output>-object )
-                                                            ( ls_tadir ) ).
-          LOOP AT lt_tadir REFERENCE INTO DATA(lr_tadir).
-            INSERT CORRESPONDING #( lr_tadir->* EXCEPT expand ) INTO gt_tadir_output
-                   INDEX row + sy-tabix.
-          ENDLOOP.
+          DATA(lv_add_subrows_index) = row + 1.
+          INSERT LINES OF VALUE zkco_samples_salv_tadir_out_t(
+              FOR ls_tadir IN gt_tadir
+              WHERE ( pgmid  EQ <ls_tadir_output>-pgmid AND
+                      object EQ <ls_tadir_output>-object )
+              ( CORRESPONDING #( ls_tadir ) ) )
+            INTO gt_tadir_output
+            INDEX lv_add_subrows_index.
         ELSE.
           <ls_tadir_output>-expand = lcl_handle_events=>get_icon( iv_type = 'E' ).
-          DELETE gt_tadir_output  FROM sy-tabix + 1
-                                  WHERE pgmid  EQ <ls_tadir_output>-pgmid
-                                    AND object EQ <ls_tadir_output>-object.
+          DELETE gt_tadir_output  WHERE pgmid  EQ <ls_tadir_output>-pgmid
+                                    AND object EQ <ls_tadir_output>-object
+                                    AND expand IS INITIAL.
         ENDIF.
 
-        go_salv_table->refresh( s_stable     = VALUE #( row = abap_true col = abap_true )
-                                refresh_mode = if_salv_c_refresh=>soft ).
+        go_salv_table->refresh( refresh_mode = if_salv_c_refresh=>full ).
     ENDCASE.
   ENDMETHOD.
 
