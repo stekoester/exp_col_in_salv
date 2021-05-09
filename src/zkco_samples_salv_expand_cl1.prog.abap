@@ -26,7 +26,7 @@ CLASS lcl_handle_events DEFINITION.
         IMPORTING
           e_salv_function
           sender,
-      handle_link_click     FOR EVENT link_click   OF cl_salv_events_table
+      handle_link_click     FOR EVENT link_click     OF cl_salv_events_table
         IMPORTING
           row
           column
@@ -43,12 +43,8 @@ CLASS lcl_handle_events IMPLEMENTATION.
 
   METHOD handle_added_function.
     DATA:
-      lv_count       TYPE i,
-      lv_tabix       TYPE i,
-      lv_refresh_alv TYPE abap_bool.
-
-    DATA:
-      ls_stable TYPE lvc_s_stbl.
+      lv_add_subrows_index TYPE i,
+      lv_refresh_alv       TYPE abap_bool.
 
     DATA:
       lr_tadir TYPE REF TO zkco_samples_salv_tadir.
@@ -66,15 +62,14 @@ CLASS lcl_handle_events IMPLEMENTATION.
           WHEN gcs_toolbar-expall_name.
             LOOP  AT gt_tadir_output ASSIGNING <ls_tadir_output>
                   WHERE expand(3) EQ icon_expand(3).
-              lv_tabix = sy-tabix.
+              lv_add_subrows_index = sy-tabix + 1.
               <ls_tadir_output>-expand = lcl_handle_events=>get_icon( iv_type = 'C' ).
-              CLEAR: lv_count.
               LOOP  AT gt_tadir REFERENCE INTO lr_tadir
                     WHERE pgmid  EQ <ls_tadir_output>-pgmid
                       AND object EQ <ls_tadir_output>-object.
-                lv_count = lv_count + 1.
-                INSERT INITIAL LINE INTO gt_tadir_output INDEX lv_tabix + lv_count ASSIGNING <ls_tadir_output_new>.
+                INSERT INITIAL LINE INTO gt_tadir_output INDEX lv_add_subrows_index ASSIGNING <ls_tadir_output_new>.
                 MOVE-CORRESPONDING lr_tadir->* TO <ls_tadir_output_new>.
+                lv_add_subrows_index = lv_add_subrows_index + 1.
               ENDLOOP.
             ENDLOOP.
             IF sy-subrc EQ 0.
@@ -84,9 +79,9 @@ CLASS lcl_handle_events IMPLEMENTATION.
             LOOP  AT gt_tadir_output ASSIGNING <ls_tadir_output>
                   WHERE expand(3) EQ icon_collapse(3).
               <ls_tadir_output>-expand = lcl_handle_events=>get_icon( iv_type = 'E' ).
-              DELETE gt_tadir_output  FROM sy-tabix + 1
-                                      WHERE pgmid  EQ <ls_tadir_output>-pgmid
-                                        AND object EQ <ls_tadir_output>-object.
+              DELETE gt_tadir_output  WHERE pgmid  EQ <ls_tadir_output>-pgmid
+                                        AND object EQ <ls_tadir_output>-object
+                                        AND expand IS INITIAL.
             ENDLOOP.
             IF sy-subrc EQ 0.
               lv_refresh_alv = abap_true.
@@ -108,6 +103,7 @@ CLASS lcl_handle_events IMPLEMENTATION.
     DATA:
       lv_name TYPE iconname,
       lv_info TYPE text40.
+
     CASE iv_type.
       WHEN 'E'.
         lv_name = icon_expand.
@@ -116,6 +112,7 @@ CLASS lcl_handle_events IMPLEMENTATION.
         lv_name = icon_collapse.
         lv_info = 'Collapse Details'(c02).
     ENDCASE.
+
     CALL FUNCTION 'ICON_CREATE'
       EXPORTING
         name                  = lv_name
@@ -131,12 +128,7 @@ CLASS lcl_handle_events IMPLEMENTATION.
 
   METHOD handle_link_click.
     DATA:
-      lv_count       TYPE i,
-      lv_tabix       TYPE i,
-      lv_refresh_alv TYPE abap_bool.
-
-    DATA:
-      ls_stable TYPE lvc_s_stbl.
+      lv_add_subrows_index TYPE i.
 
     DATA:
       lr_tadir TYPE REF TO zkco_samples_salv_tadir.
@@ -150,24 +142,22 @@ CLASS lcl_handle_events IMPLEMENTATION.
         READ TABLE gt_tadir_output ASSIGNING <ls_tadir_output> INDEX row.
         IF <ls_tadir_output>-expand(3) EQ icon_expand(3).
           <ls_tadir_output>-expand = lcl_handle_events=>get_icon( iv_type = 'C' ).
+          lv_add_subrows_index = row + 1.
           LOOP  AT gt_tadir REFERENCE INTO lr_tadir
                 WHERE pgmid  EQ <ls_tadir_output>-pgmid
                   AND object EQ <ls_tadir_output>-object.
-            lv_count = lv_count + 1.
-            INSERT INITIAL LINE INTO gt_tadir_output INDEX row + lv_count ASSIGNING <ls_tadir_output_new>.
+            INSERT INITIAL LINE INTO gt_tadir_output INDEX lv_add_subrows_index ASSIGNING <ls_tadir_output_new>.
             MOVE-CORRESPONDING lr_tadir->* TO <ls_tadir_output_new>.
+            lv_add_subrows_index = lv_add_subrows_index + 1.
           ENDLOOP.
         ELSE.
           <ls_tadir_output>-expand = lcl_handle_events=>get_icon( iv_type = 'E' ).
-          DELETE gt_tadir_output  FROM row + 1
-                                  WHERE pgmid  EQ <ls_tadir_output>-pgmid
-                                    AND object EQ <ls_tadir_output>-object.
+          DELETE gt_tadir_output  WHERE pgmid  EQ <ls_tadir_output>-pgmid
+                                    AND object EQ <ls_tadir_output>-object
+                                    AND expand IS INITIAL.
         ENDIF.
 
-        ls_stable-row = abap_true.
-        ls_stable-col = abap_true.
-        go_salv_table->refresh( s_stable     = ls_stable
-                                refresh_mode = if_salv_c_refresh=>soft ).
+        go_salv_table->refresh( refresh_mode = if_salv_c_refresh=>full ).
     ENDCASE.
   ENDMETHOD.
 
