@@ -83,10 +83,16 @@ CLASS lcl_handle_events IMPLEMENTATION.
   METHOD get_icon.
     CALL FUNCTION 'ICON_CREATE'
       EXPORTING
-        name                  = SWITCH #( iv_type WHEN 'E' THEN icon_expand
-                                                  WHEN 'C' THEN icon_collapse )
-        info                  = SWITCH text40( iv_type WHEN 'E' THEN 'Expand Details'(e02)
-                                                       WHEN 'C' THEN 'Collapse Details'(c02) )
+        name                  = SWITCH #( iv_type
+                                          WHEN 'E'
+                                          THEN icon_expand
+                                          WHEN 'C'
+                                          THEN icon_collapse )
+        info                  = SWITCH text40( iv_type
+                                               WHEN 'E'
+                                               THEN 'Expand Details'(e02)
+                                               WHEN 'C'
+                                               THEN 'Collapse Details'(c02) )
         add_stdinf            = ' '
       IMPORTING
         result                = rv_icon
