@@ -1,6 +1,6 @@
 FORM data_get.
   DO.
-    ASSIGN COMPONENT sy-index OF STRUCTURE gs_tadir_objects TO FIELD-SYMBOL(<lv_object>).
+    ASSIGN COMPONENT sy-index OF STRUCTURE co_tadir_objects TO FIELD-SYMBOL(<lv_object>).
     IF sy-subrc NE 0.
       EXIT.
     ENDIF.
