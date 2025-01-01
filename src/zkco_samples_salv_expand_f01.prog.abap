@@ -10,7 +10,7 @@ FORM data_get.
 
   APPEND ls_cell_type TO ls_tadir_output-cell_type.
   DO.
-    ASSIGN COMPONENT sy-index OF STRUCTURE gcs_tadir_objects TO <lv_object>.
+    ASSIGN COMPONENT sy-index OF STRUCTURE co_tadir_objects TO <lv_object>.
     IF sy-subrc NE 0.
       EXIT.
     ENDIF.
@@ -70,20 +70,20 @@ FORM alv_display.
       ENDTRY.
 
       TRY.
-          lv_icon = lcl_handle_events=>gcs_toolbar-expall_icon.
-          go_salv_table->get_functions( )->add_function( name     = lcl_handle_events=>gcs_toolbar-expall_name
-                                                         tooltip  = lcl_handle_events=>gcs_toolbar-expall_tooltip
+          lv_icon = lcl_handle_events=>gs_toolbar-expall_icon.
+          go_salv_table->get_functions( )->add_function( name     = lcl_handle_events=>gs_toolbar-expall_name
+                                                         tooltip  = lcl_handle_events=>gs_toolbar-expall_tooltip
                                                          icon     = lv_icon
-                                                         position = lcl_handle_events=>gcs_toolbar-expall_position ).
+                                                         position = lcl_handle_events=>gs_toolbar-expall_position ).
         CATCH cx_salv_wrong_call.
         CATCH cx_salv_existing.
       ENDTRY.
       TRY.
-          lv_icon = lcl_handle_events=>gcs_toolbar-colall_icon.
-          go_salv_table->get_functions( )->add_function( name     = lcl_handle_events=>gcs_toolbar-colall_name
-                                                         tooltip  = lcl_handle_events=>gcs_toolbar-colall_tooltip
+          lv_icon = lcl_handle_events=>gs_toolbar-colall_icon.
+          go_salv_table->get_functions( )->add_function( name     = lcl_handle_events=>gs_toolbar-colall_name
+                                                         tooltip  = lcl_handle_events=>gs_toolbar-colall_tooltip
                                                          icon     = lv_icon
-                                                         position = lcl_handle_events=>gcs_toolbar-colall_position ).
+                                                         position = lcl_handle_events=>gs_toolbar-colall_position ).
         CATCH cx_salv_wrong_call.
         CATCH cx_salv_existing.
       ENDTRY.

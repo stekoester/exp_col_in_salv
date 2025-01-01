@@ -1,7 +1,7 @@
 CLASS lcl_handle_events DEFINITION.
   PUBLIC SECTION.
     CLASS-DATA:
-      BEGIN OF gcs_toolbar,
+      BEGIN OF gs_toolbar,
         expall_name     TYPE salv_de_function VALUE 'EXPALL',
         expall_icon     TYPE iconname VALUE icon_expand_all,
         colall_name     TYPE salv_de_function VALUE 'COLALL',
@@ -10,7 +10,7 @@ CLASS lcl_handle_events DEFINITION.
         colall_tooltip  TYPE string,
         expall_position TYPE salv_de_function_pos VALUE if_salv_c_function_position=>right_of_salv_functions,
         colall_position TYPE salv_de_function_pos VALUE if_salv_c_function_position=>right_of_salv_functions,
-      END OF gcs_toolbar.
+      END OF gs_toolbar.
 
     CLASS-METHODS class_constructor.
 
@@ -18,12 +18,12 @@ CLASS lcl_handle_events DEFINITION.
       IMPORTING
         iv_type        TYPE char1
       RETURNING
-        value(rv_icon) TYPE text40.
+        VALUE(rv_icon) TYPE text40.
 
     METHODS handle_added_function FOR EVENT added_function OF cl_salv_events_table
-        IMPORTING
-          e_salv_function
-          sender.
+      IMPORTING
+        e_salv_function
+        sender.
 
     METHODS handle_link_click     FOR EVENT link_click     OF cl_salv_events_table
       IMPORTING
@@ -35,8 +35,8 @@ ENDCLASS.
 
 CLASS lcl_handle_events IMPLEMENTATION.
   METHOD class_constructor.
-    gcs_toolbar-expall_tooltip = 'Expand all Details'(e01).
-    gcs_toolbar-colall_tooltip = 'Collapse all Details'(c01).
+    gs_toolbar-expall_tooltip = 'Expand all Details'(e01).
+    gs_toolbar-colall_tooltip = 'Collapse all Details'(c01).
   ENDMETHOD.
 
   METHOD handle_added_function.
@@ -53,7 +53,7 @@ CLASS lcl_handle_events IMPLEMENTATION.
     TRY.
         lo_filters = go_salv_table->get_filters( ).
         CASE e_salv_function.
-          WHEN gcs_toolbar-expall_name.
+          WHEN gs_toolbar-expall_name.
             LOOP  AT gt_tadir_output ASSIGNING <ls_tadir_output>
                   WHERE expand(3) EQ icon_expand(3).
               lv_add_subrows_index = sy-tabix + 1.
@@ -69,7 +69,7 @@ CLASS lcl_handle_events IMPLEMENTATION.
             IF sy-subrc EQ 0.
               lv_refresh_alv = abap_true.
             ENDIF.
-          WHEN gcs_toolbar-colall_name.
+          WHEN gs_toolbar-colall_name.
             LOOP  AT gt_tadir_output ASSIGNING <ls_tadir_output>
                   WHERE expand(3) EQ icon_collapse(3).
               <ls_tadir_output>-expand = lcl_handle_events=>get_icon( iv_type = 'E' ).
