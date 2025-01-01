@@ -1,11 +1,9 @@
 FORM data_get.
-  DATA:
-    ls_tadir_output TYPE zkco_samples_salv_tadir_output,
-    ls_tadir        TYPE zkco_samples_salv_tadir,
-    ls_cell_type    TYPE salv_s_int4_column.
+  DATA ls_tadir_output TYPE zkco_samples_salv_tadir_output.
+  DATA ls_tadir TYPE zkco_samples_salv_tadir.
+  DATA ls_cell_type TYPE salv_s_int4_column.
 
-  FIELD-SYMBOLS:
-    <lv_object> TYPE trobjtype.
+  FIELD-SYMBOLS <lv_object> TYPE trobjtype.
 
   ls_cell_type-columnname = 'EXPAND'.
   ls_cell_type-value      = if_salv_c_cell_type=>hotspot.
@@ -37,13 +35,11 @@ FORM data_display.
 ENDFORM.
 
 FORM alv_display.
-  DATA:
-    lv_icon             TYPE string.
+  DATA lv_icon             TYPE string.
 
-  DATA:
-    lo_custom_container TYPE REF TO cl_gui_custom_container,
-    lr_events           TYPE REF TO cl_salv_events_table,
-    lr_event_handler    TYPE REF TO lcl_handle_events.
+  DATA lo_custom_container TYPE REF TO cl_gui_custom_container.
+  DATA lr_events TYPE REF TO cl_salv_events_table.
+  DATA lr_event_handler TYPE REF TO lcl_handle_events.
 
   TRY.
       CREATE OBJECT lo_custom_container

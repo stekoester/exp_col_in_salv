@@ -12,49 +12,43 @@ CLASS lcl_handle_events DEFINITION.
         colall_position TYPE salv_de_function_pos VALUE if_salv_c_function_position=>right_of_salv_functions,
       END OF gcs_toolbar.
 
-    CLASS-METHODS:
-      class_constructor,
+    CLASS-METHODS class_constructor.
 
-      get_icon
-        IMPORTING
-          iv_type        TYPE char1
-        RETURNING
-          value(rv_icon) TYPE text40.
+    CLASS-METHODS get_icon
+      IMPORTING
+        iv_type        TYPE char1
+      RETURNING
+        value(rv_icon) TYPE text40.
 
-    METHODS:
-      handle_added_function FOR EVENT added_function OF cl_salv_events_table
+    METHODS handle_added_function FOR EVENT added_function OF cl_salv_events_table
         IMPORTING
           e_salv_function
-          sender,
-      handle_link_click     FOR EVENT link_click     OF cl_salv_events_table
-        IMPORTING
-          row
-          column
           sender.
+
+    METHODS handle_link_click     FOR EVENT link_click     OF cl_salv_events_table
+      IMPORTING
+        row
+        column
+        sender.
 ENDCLASS.
 
-CLASS lcl_handle_events IMPLEMENTATION.
 
+CLASS lcl_handle_events IMPLEMENTATION.
   METHOD class_constructor.
     gcs_toolbar-expall_tooltip = 'Expand all Details'(e01).
     gcs_toolbar-colall_tooltip = 'Collapse all Details'(c01).
   ENDMETHOD.
 
-
   METHOD handle_added_function.
-    DATA:
-      lv_add_subrows_index TYPE i,
-      lv_refresh_alv       TYPE abap_bool.
+    DATA lv_add_subrows_index TYPE i.
+    DATA lv_refresh_alv TYPE abap_bool.
 
-    DATA:
-      lr_tadir TYPE REF TO zkco_samples_salv_tadir.
+    DATA lr_tadir TYPE REF TO zkco_samples_salv_tadir.
 
-    DATA:
-      lo_filters TYPE REF TO cl_salv_filters.
+    DATA lo_filters TYPE REF TO cl_salv_filters.
 
-    FIELD-SYMBOLS:
-      <ls_tadir_output>     TYPE zkco_samples_salv_tadir_output,
-      <ls_tadir_output_new> TYPE zkco_samples_salv_tadir_output.
+    FIELD-SYMBOLS <ls_tadir_output> TYPE zkco_samples_salv_tadir_output.
+    FIELD-SYMBOLS <ls_tadir_output_new> TYPE zkco_samples_salv_tadir_output.
 
     TRY.
         lo_filters = go_salv_table->get_filters( ).
@@ -97,12 +91,9 @@ CLASS lcl_handle_events IMPLEMENTATION.
     ENDIF.
   ENDMETHOD.
 
-
-
   METHOD get_icon.
-    DATA:
-      lv_name TYPE iconname,
-      lv_info TYPE text40.
+    DATA lv_name TYPE iconname.
+    DATA lv_info TYPE text40.
 
     CASE iv_type.
       WHEN 'E'.
@@ -127,15 +118,12 @@ CLASS lcl_handle_events IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD handle_link_click.
-    DATA:
-      lv_add_subrows_index TYPE i.
+    DATA lv_add_subrows_index TYPE i.
 
-    DATA:
-      lr_tadir TYPE REF TO zkco_samples_salv_tadir.
+    DATA lr_tadir TYPE REF TO zkco_samples_salv_tadir.
 
-    FIELD-SYMBOLS:
-      <ls_tadir_output>     TYPE zkco_samples_salv_tadir_output,
-      <ls_tadir_output_new> TYPE zkco_samples_salv_tadir_output.
+    FIELD-SYMBOLS <ls_tadir_output> TYPE zkco_samples_salv_tadir_output.
+    FIELD-SYMBOLS <ls_tadir_output_new> TYPE zkco_samples_salv_tadir_output.
 
     CASE column.
       WHEN 'EXPAND'.
@@ -160,5 +148,4 @@ CLASS lcl_handle_events IMPLEMENTATION.
         go_salv_table->refresh( refresh_mode = if_salv_c_refresh=>full ).
     ENDCASE.
   ENDMETHOD.
-
 ENDCLASS.
