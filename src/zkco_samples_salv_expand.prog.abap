@@ -11,12 +11,6 @@ INCLUDE zkco_samples_salv_expand_f01.
 INCLUDE zkco_samples_salv_expand_o0100.
 INCLUDE zkco_samples_salv_expand_i0100.
 
-INITIALIZATION.
-
-AT SELECTION-SCREEN OUTPUT.
-
-AT SELECTION-SCREEN.
-
 START-OF-SELECTION.
   PERFORM data_get.
 

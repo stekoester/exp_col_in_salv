@@ -1,14 +1,14 @@
 FORM data_get.
   DO.
-    ASSIGN COMPONENT sy-index OF STRUCTURE gcs_tadir_objects TO FIELD-SYMBOL(<lv_object>).
+    ASSIGN COMPONENT sy-index OF STRUCTURE gs_tadir_objects TO FIELD-SYMBOL(<lv_object>).
     IF sy-subrc NE 0.
       EXIT.
     ENDIF.
-    SELECT pgmid object obj_name korrnum srcsystem author srcdep devclass
-      FROM tadir APPENDING TABLE gt_tadir                                        "#EC CI_GENBUFF
+    SELECT pgmid, object, obj_name, korrnum, srcsystem, author, srcdep, devclass
+      FROM tadir APPENDING TABLE @gt_tadir                                        "#EC CI_GENBUFF
       UP TO 5 ROWS
       WHERE pgmid    EQ 'R3TR'
-        AND object   EQ <lv_object>
+        AND object   EQ @<lv_object>
         AND devclass EQ 'SCTS_CAT'.
     IF sy-subrc EQ 0.
       DATA(ls_tadir) = gt_tadir[ lines( gt_tadir ) ].
@@ -51,18 +51,18 @@ FORM alv_display.
       ENDTRY.
 
       TRY.
-          go_salv_table->get_functions( )->add_function( name = lcl_handle_events=>gcs_toolbar-expall_name
-                                                         tooltip = lcl_handle_events=>gcs_toolbar-expall_tooltip
-                                                         icon = CONV #( lcl_handle_events=>gcs_toolbar-expall_icon )
-                                                         position = lcl_handle_events=>gcs_toolbar-expall_position ).
+          go_salv_table->get_functions( )->add_function( name = lcl_handle_events=>gs_toolbar-expall_name
+                                                         tooltip = lcl_handle_events=>gs_toolbar-expall_tooltip
+                                                         icon = CONV #( lcl_handle_events=>gs_toolbar-expall_icon )
+                                                         position = lcl_handle_events=>gs_toolbar-expall_position ).
         CATCH cx_salv_wrong_call.
         CATCH cx_salv_existing.
       ENDTRY.
       TRY.
-          go_salv_table->get_functions( )->add_function( name = lcl_handle_events=>gcs_toolbar-colall_name
-                                                         tooltip = lcl_handle_events=>gcs_toolbar-colall_tooltip
-                                                         icon = CONV #( lcl_handle_events=>gcs_toolbar-colall_icon )
-                                                         position = lcl_handle_events=>gcs_toolbar-colall_position ).
+          go_salv_table->get_functions( )->add_function( name = lcl_handle_events=>gs_toolbar-colall_name
+                                                         tooltip = lcl_handle_events=>gs_toolbar-colall_tooltip
+                                                         icon = CONV #( lcl_handle_events=>gs_toolbar-colall_icon )
+                                                         position = lcl_handle_events=>gs_toolbar-colall_position ).
         CATCH cx_salv_wrong_call.
         CATCH cx_salv_existing.
       ENDTRY.
